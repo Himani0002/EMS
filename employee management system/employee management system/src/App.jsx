@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Login from './components/Auth/Login';
 import EmployeeDashboard from './components/Auth/Dashboard/EmployeeDashboard';
 import AdminDashboard from './components/Auth/Dashboard/AdminDashboard';
 import { getLocalStorage, setLocalStorage } from './utils/localStorage';
+import { AuthContext } from './context/AuthProvider';
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const authData = useContext(AuthContext);
 
   useEffect(() => {
-    // Optionally retrieve the user from localStorage if needed
     const storedUser = getLocalStorage('user');
     if (storedUser) {
       setUser(storedUser);
@@ -18,16 +19,18 @@ const App = () => {
   const handleLogin = (email, password) => {
     if (email === 'admin@me.com' && password === '123') {
       setUser('admin');
-      setLocalStorage('user', 'admin'); // Store user in localStorage
-    } else if (email === 'employee@me.com' && password === '456') {
+      setLocalStorage('user', 'admin');
+    } else if (
+      authData &&
+      authData.employees &&
+      authData.employees.find((e) => e.email === email && e.password === password)
+    ) {
       setUser('employee');
-      setLocalStorage('user', 'employee'); // Store user in localStorage
+      setLocalStorage('user', 'employee');
     } else {
       alert('Invalid Credentials');
     }
   };
-
-
 
   return (
     <>
